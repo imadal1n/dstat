@@ -1,0 +1,175 @@
+.\" $Id: dstat.1 46 2021-08-03 20:48:15Z umaxx $
+.\" Copyright (c) 2016-2021 Joerg Jung <mail@umaxx.net>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd August 03, 2021
+.Dt DSTAT 1
+.Os
+.Sh NAME
+.Nm dstat
+.Nd dwm status bar statistics
+.Sh SYNOPSIS
+.Nm dstat
+.Ar if
+.Nm dstat
+.Cm version
+.Sh DESCRIPTION
+.Nm
+is a lightweight utility to set the
+.Xr dwm 1
+status bar text.
+.Nm
+displays the current network throughput for the given interface
+.Ar if ,
+wireless signal quality, CPU usage, performance settings, power/battery status,
+temperature, volume settings, as well as the current date and time on the
+.Xr dwm 1
+status bar.
+.Pp
+The arguments are as follows:
+.Bl -tag -width "version"
+.It Ar if
+Specify the interface to collect the network statistics.
+.It Cm version
+Print the
+.Cm version
+and copyright information of
+.Nm
+to the standard output, then exit.
+.El
+.Pp
+.Nm
+is supposed to be started with the
+.Xr dwm 1
+session.
+.Nm
+updates the statistics shown on the
+.Xr dwm 1
+status bar every second using the results from
+.Xr ioctl 2 ,
+calls as well as calls to
+.Xr apm 4 ,
+.Xr getifaddrs 3 ,
+.Xr sndio 7 ,
+.Xr sysctl 2 ,
+and
+.Xr time 3 .
+If a battery is available,
+.Nm
+displays a warning window if the estimated number of minutes for the remaining
+battery life drops below 10 minutes.
+.Sh EXIT STATUS
+.Ex -std
+.Sh EXAMPLES
+Run
+.Nm
+using the urtwn0 network interface:
+.Bd -literal -offset indent
+$ dstat urtwn0 &
+.Ed
+.Pp
+Print
+.Cm version
+and copyright information of
+.Nm
+to the standard output stream and exit successfully:
+.Bd -literal -offset indent
+$ dstat version
+.Ed
+.Ss Integrations
+Pipe
+.Nm
+output to dzen2:
+.Bd -literal -offset indent
+$ dstat urtwn0 | dzen2 -fn "-*-terminus-medium-*-*-*-*-*-*-*-*-*-*-*"
+.Ed
+.Pp
+Use
+.Nm
+output in
+.Xr i3 1
+via
+.Xr i3bar 1
+by adding the the following lines to the configuration:
+.Bd -literal -offset indent
+bar {
+    status_command dstat trunk0
+}
+.Ed
+.Pp
+Pipe
+.Nm
+output to
+.Xr lemonbar 1 :
+.Bd -literal -offset indent
+$ dstat urtwn0 | lemonbar -d -f "-*-terminus-medium-*-*-*-*-*-*-*-*-*-*-*"
+.Ed
+.Pp
+Use
+.Nm
+output in right status bar of
+.Xr tmux 1
+by adding the following configuration commands:
+.Bd -literal -offset indent
+set -g status-right-length 100
+set -g status-right '#(dstat trunk0)'
+.Ed
+.Pp
+Pipe
+.Nm
+output to xmobar:
+.Bd -literal -offset indent
+$ dstat urtwn0 | \\
+> xmobar -b -f "-*-terminus-medium-*-*-*-*-*-*-*-*-*-*-*" \\
+> -t "%StdinReader%" -c "[Run StdinReader]"
+.Ed
+.Pp
+.Nm
+can also be used with
+.Xr tint2 1
+by adding an executor to the panel items within the configuration,
+like in the following:
+.Bd -literal -offset indent
+execp = new
+execp_command = /usr/local/bin/dstat trunk0
+execp_interval = 0
+execp_continuous = 1
+panel_items = TE
+.Ed
+.Sh SEE ALSO
+.Xr dwm 1 ,
+.Xr ioctl 2 ,
+.Xr sysctl 2 ,
+.Xr getifaddrs 3 ,
+.Xr time 3 ,
+.Xr apm 4 ,
+.Xr sndio 7
+.Sh STANDARDS
+The
+.Nm
+utility is not compliant with any specification.
+.Pp
+Where portability is paramount, do not use it.
+.Sh HISTORY
+The first version of the
+.Nm
+utility was a shell script and appeared back in May 2013.
+.Sh AUTHORS
+.An -nosplit
+.Nm
+was written by
+.An Joerg Jung Aq Mt mail@umaxx.net .
+.Sh CAVEATS
+Displayed wireless signal quality is rather coarse grained.
+.Sh HOMEPAGE
+.Lk https://www.umaxx.net/
